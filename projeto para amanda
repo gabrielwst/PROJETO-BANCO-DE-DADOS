@@ -1,0 +1,118 @@
+
+banco_dados = {}
+
+
+historico_transacoes = {}
+
+
+
+def criar_conta(nome, numero_conta, saldo_inicial=0):
+    if numero_conta in banco_dados:
+        return "Erro: Número de conta já existente!"
+    banco_dados[numero_conta] = {"nome": nome, "saldo": saldo_inicial}
+    historico_transacoes[numero_conta] = []
+    return f"Conta criada com sucesso para {nome}!"
+
+
+
+def consultar_saldo(numero_conta):
+    conta = banco_dados.get(numero_conta)
+    if not conta:
+        return "Erro: Conta não encontrada!"
+    return f"Saldo atual de {conta['nome']}: R$ {conta['saldo']:.2f}"
+
+
+def depositar(numero_conta, valor):
+    conta = banco_dados.get(numero_conta)
+    if not conta:
+        return "Erro: Conta não encontrada!"
+    if valor <= 0:
+        return "Erro: Valor de depósito inválido!"
+    conta["saldo"] += valor
+    historico_transacoes[numero_conta].append(f"Depósito de R$ {valor:.2f}")
+    return f"Depósito realizado com sucesso! Saldo atual: R$ {conta['saldo']:.2f}"
+
+
+def sacar(numero_conta, valor):
+    conta = banco_dados.get(numero_conta)
+    if not conta:
+        return "Erro: Conta não encontrada!"
+    if valor <= 0:
+        return "Erro: Valor de saque inválido!"
+    if conta["saldo"] < valor:
+        return "Erro: Saldo insuficiente!"
+    conta["saldo"] -= valor
+    historico_transacoes[numero_conta].append(f"Saque de R$ {valor:.2f}")
+    return f"Saque realizado com sucesso! Saldo atual: R$ {conta['saldo']:.2f}"
+
+
+def encerrar_conta(numero_conta):
+    conta = banco_dados.get(numero_conta)
+    if not conta:
+        return "Erro: Conta não encontrada!"
+    if conta["saldo"] != 0:
+        return "Erro: A conta precisa ter saldo zerado para ser encerrada!"
+    del banco_dados[numero_conta]
+    del historico_transacoes[numero_conta]
+    return "Conta encerrada com sucesso!"
+
+
+def exibir_historico(numero_conta):
+    if numero_conta not in historico_transacoes:
+        return "Erro: Conta não encontrada!"
+    historico = historico_transacoes[numero_conta]
+    if not historico:
+        return "Nenhuma movimentação registrada."
+    return "\n".join(historico)
+
+
+
+def menu():
+    while True:
+        print("\n--- Menu do Sistema Bancário ---")
+        print("1. Criar Conta")
+        print("2. Consultar Saldo")
+        print("3. Depositar")
+        print("4. Sacar")
+        print("5. Encerrar Conta")
+        print("6. Exibir Histórico de Transações")
+        print("0. Sair")
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == "1":
+            nome = input("Digite o nome do cliente: ")
+            numero_conta = input("Digite o número da conta: ")
+            saldo_inicial = float(input("Digite o saldo inicial (ou 0): "))
+            print(criar_conta(nome, numero_conta, saldo_inicial))
+
+        elif opcao == "2":
+            numero_conta = input("Digite o número da conta: ")
+            print(consultar_saldo(numero_conta))
+
+        elif opcao == "3":
+            numero_conta = input("Digite o número da conta: ")
+            valor = float(input("Digite o valor a ser depositado: "))
+            print(depositar(numero_conta, valor))
+
+        elif opcao == "4":
+            numero_conta = input("Digite o número da conta: ")
+            valor = float(input("Digite o valor a ser sacado: "))
+            print(sacar(numero_conta, valor))
+
+        elif opcao == "5":
+            numero_conta = input("Digite o número da conta: ")
+            print(encerrar_conta(numero_conta))
+
+        elif opcao == "6":
+            numero_conta = input("Digite o número da conta: ")
+            print(exibir_historico(numero_conta))
+
+        elif opcao == "0":
+            print("Saindo do sistema...")
+            break
+
+        else:
+            print("Opção inválida! Tente novamente.")
+
+
+menu()
